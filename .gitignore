@@ -15,5 +15,7 @@
 .vscode/
 .idea/
 
+**/*.csproj.user
+
 .DS_Store
 Thumbs.db
