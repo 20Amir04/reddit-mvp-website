@@ -1,4 +1,4 @@
-
+# Frontend
 **/node_modules/
 **/dist/
 **/.env
@@ -6,16 +6,18 @@
 **/.env.development.local
 **/.env.production.local
 
+# Backend
 **/bin/
 **/obj/
 **/.vs/
+**/*.csproj.user
 **/appsettings.Development.json
 **/Properties/launchSettings.json
 
+# IDE
 .vscode/
 .idea/
 
-**/*.csproj.user
-
+# OS
 .DS_Store
 Thumbs.db
