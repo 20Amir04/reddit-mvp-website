@@ -1,11 +1,18 @@
 import { useState } from "react";
+import {Link, useNavigate} from "react-router-dom"
 import {
     Bars3Icon,
     XMarkIcon,
     MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
 
-const mobileMenuItems = ["Home", "Popular", "Explore", "Communities", "Saved"];                                                         
+const mobileMenuItems = [
+    {label: "Home", path: "/"}, 
+    {label: "Popular", path: "/"}, 
+    {label: "Explore", path: "/communities"}, 
+    {label: "Communities", path: "/communities"}, 
+    {label: "Saved", path: "/"},
+];                                                         
 
 function Navbar() {
     const [isMenuOpen, SetIsMenuOpen] = useState(false);
@@ -26,15 +33,19 @@ function Navbar() {
                     )}
                 </button>
 
-                <div className="flex shrink-0 items-center gap-2">
+                
+                <Link
+                    to="/"
+                    className="flex shrink-0 items-center gap-2"
+                >
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-500 text-sm font-bold text-white sm:h-9 sm:w-9 sm:text-base">
-                        R
+                            R
                     </div>
 
                     <span className="hidden text-lg font-bold text-white sm:block lg:text-xl">
                         Reddit MVP
                     </span>
-                </div>
+                </Link>
 
                 <div className="hidden flex-1 justify-center md:flex">
                     <div className="relative w-full max-w-md lg:max-w-xl">
@@ -55,13 +66,13 @@ function Navbar() {
                 </div>
 
                 <div className="flex shrink-0 items-center gap-1 sm:gap-2">
-                    <button className="hidden rounded-full px-3 py-2 text-sm font-semibold text-neutral-200 hover:bg-white/10 sm:block lg:px-4">
+                    <Link to="/login" className="hidden rounded-full px-3 py-2 text-sm font-semibold text-neutral-200 hover:bg-white/10 sm:block lg:px-4">
                         Log In
-                    </button>
+                    </Link>
 
-                    <button className="rounded-full bg-orange-500 px-3 py-1.5 text-sm font-semibold text-white hover:bg-orange-600 sm:px-4 sm:py-2">
+                    <Link  to="/register" className="rounded-full bg-orange-500 px-3 py-1.5 text-sm font-semibold text-white hover:bg-orange-600 sm:px-4 sm:py-2">
                         Sign Up
-                    </button>
+                    </Link>
                 </div>
             </div>
 
@@ -80,23 +91,25 @@ function Navbar() {
 
                         <nav className="space-y-1">
                             {mobileMenuItems.map((item) => (
-                                <button
-                                    key={item}
+                                <Link
+                                    key={item.label}
+                                    to={item.path}
+                                    onClick={() => SetIsMenuOpen(false)}
                                     className="w-full rounded-xl px-4 py-3 text-left text-sm font-medium text-neutral-200 hover:bg-white/10"
                                 >
-                                    {item}
-                                </button>
+                                    {item.label}
+                                </Link>
                             ))}
                         </nav>
 
                         <div className="grid grid-cols-2 gap-2 sm:hidden">
-                            <button className="rounded-full border border-white/10 px-4 py-2.5 text-sm font-semibold text-neutral-200 hover:bg-white/10">
+                            <Link to="/login" className="rounded-full border border-white/10 px-4 py-2.5 text-sm font-semibold text-neutral-200 hover:bg-white/10">
                                 Log In
-                            </button>
+                            </Link>
 
-                            <button className="rounded-full bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-orange-600">
+                            <Link to="/register" className="rounded-full bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-orange-600">
                                 Sign Up
-                            </button>
+                            </Link>
                         </div>
                     </div>
                 </div>
