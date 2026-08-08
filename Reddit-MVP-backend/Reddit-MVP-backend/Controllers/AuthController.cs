@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Reddit_MVP_backend.DTOs;
 using Reddit_MVP_backend.Models;
+using Reddit_MVP_backend.Services;
 
 namespace Reddit_MVP_backend.Controllers
 {
@@ -10,11 +11,13 @@ namespace Reddit_MVP_backend.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
+        private readonly JwtTokenService _jwtTokenService;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public AuthController(UserManager<ApplicationUser> userManager)
+        public AuthController(UserManager<ApplicationUser> userManager, JwtTokenService jwtTokenService)
         {
             _userManager = userManager;
+            _jwtTokenService = jwtTokenService;
         }
 
         [HttpPost("register")]
@@ -76,6 +79,54 @@ namespace Reddit_MVP_backend.Controllers
                     user.UserName,
                     user.Email,
                     user.CreatedAt
+                }
+            });
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(LoginDto loginDto)
+        {
+            if (string.IsNullOrWhiteSpace(loginDto.Login))
+            {
+                return BadRequest(new { message = "Username or Email is required" });
+            }
+
+            if (string.IsNullOrWhiteSpace(loginDto.Password))
+            {
+                return BadRequest(new {message = "Password is required."});
+            }
+
+            var user = await _userManager.FindByEmailAsync(loginDto.Login);
+
+            if (user == null)
+            {
+                user = await _userManager.FindByNameAsync(loginDto.Login);
+            }
+
+            if (user == null)
+            {
+                return Unauthorized(new { message = "Invalid username/email or password" });
+            }
+
+            var isPasswordValid = await _userManager.CheckPasswordAsync(user, loginDto.Password);
+
+            if (!isPasswordValid)
+            {
+                return Unauthorized(new { message = "Invalid username/email or password" });
+            }
+
+            var token = _jwtTokenService.CreateToken(user);
+
+            return Ok(new
+            {
+                message = "Login successful",
+                token,
+                user = new
+                {
+                    id = user.Id,
+                    username = user.UserName,
+                    email = user.Email,
+                    CreatedAt = user.CreatedAt
                 }
             });
         }

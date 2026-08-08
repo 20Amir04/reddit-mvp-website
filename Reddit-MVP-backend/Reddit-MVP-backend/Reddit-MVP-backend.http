@@ -12,3 +12,21 @@ Content-Type: application/json
   "email": "amir@test.com",
   "password": "Password123"
 }
+
+### Login with username
+POST https://localhost:7117/api/auth/login
+Content-Type: application/json
+
+{
+  "login": "amir",
+  "password": "Password123"
+}
+
+### Login with email
+POST https://localhost:7117/api/auth/login
+Content-Type: application/json
+
+{
+  "login": "amir@test.com",
+  "password": "Password123"
+}
