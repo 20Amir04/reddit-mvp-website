@@ -30,3 +30,10 @@ Content-Type: application/json
   "login": "amir@test.com",
   "password": "Password123"
 }
+
+### Get Current User
+GET https://localhost:7117/api/auth/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6ImUxYzIxODBkLTNjOGItNDM0Yi1hODgzLTU1MWNkNDM1MTQxNyIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJhbWlyIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvZW1haWxhZGRyZXNzIjoiYW1pckB0ZXN0LmNvbSIsImV4cCI6MTc4NjIyMzI4MCwiaXNzIjoiUmVkZGl0TXZwQXBpIiwiYXVkIjoiUmVkZGl0TXZwQ2xpZW50In0.EeDGAMGjfFZkPxRrz9N35QhGuGLAv-kbps9mHOXnFS8
+
+### Get Current User without token
+GET https://localhost:7117/api/auth/me
