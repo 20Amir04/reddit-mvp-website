@@ -3,6 +3,7 @@ import RightSidebar from "../components/RightSidebar";
 import PostCard from "../components/PostCard";
 import { mockPosts } from "../data/mockPost";
 
+
 function HomePage() {
   return (
       <main className="mx-auto flex max-w-7xl gap-4 px-3 py-4 sm:px-4 sm:py-5 lg:gap-5 lg:px-6 xl:gap-6">

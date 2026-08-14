@@ -1,11 +1,12 @@
 import {useState} from "react";
 import type { FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { registerUser } from "../api/authApi";
+import { useAuth } from "../context/AuthContext";
 
 function RegisterPage() {
     const navigate = useNavigate();
 
+    const {register} = useAuth();
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -29,7 +30,7 @@ function RegisterPage() {
         try {
             SetIsSubmitting(true);
 
-            await registerUser({
+            await register({
                 username,
                 email,
                 password,

@@ -5,6 +5,7 @@ import {
     XMarkIcon,
     MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
+import { useAuth } from "../context/AuthContext";
 
 const mobileMenuItems = [
     {label: "Home", path: "/"}, 
@@ -15,7 +16,16 @@ const mobileMenuItems = [
 ];                                                         
 
 function Navbar() {
-    const [isMenuOpen, SetIsMenuOpen] = useState(false);
+    const navigate = useNavigate();
+    const [isMenuOpen, SetIsMenuOpen] = useState(false);    
+    
+        const {user, isAuthenticated, logout} = useAuth();
+
+    function handleLogout() {
+        logout();
+        SetIsMenuOpen(false);
+        navigate("/");
+    }
 
     return(
         <header className="sticky top-0 z-50 border-b border-white/10 bg-neutral-950/95 backdrop-blur">
@@ -60,19 +70,43 @@ function Navbar() {
                 </div>
 
                 <div className="flex flex-1 justify-end md:hidden">
-                    <button className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-neutral-200 hover:bg-white/10">
+                    <button 
+                        type="button"
+                        className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-neutral-200 hover:bg-white/10"
+                        aria-label="Search"    
+                    >
                         <MagnifyingGlassIcon className="h-5 w-5" />
                     </button>
                 </div>
 
                 <div className="flex shrink-0 items-center gap-1 sm:gap-2">
-                    <Link to="/login" className="hidden rounded-full px-3 py-2 text-sm font-semibold text-neutral-200 hover:bg-white/10 sm:block lg:px-4">
-                        Log In
-                    </Link>
+                    {isAuthenticated && user ?(
+                        <>
+                            <Link 
+                                to={`/u/${user.username}`}
+                                 className="hidden rounded-full px-3 py-2 text-sm font-semibold text-neutral-200 hover:bg-white/10 sm:block lg:px-4">
+                                u/{user.username}
+                            </Link>
 
-                    <Link  to="/register" className="rounded-full bg-orange-500 px-3 py-1.5 text-sm font-semibold text-white hover:bg-orange-600 sm:px-4 sm:py-2">
-                        Sign Up
-                    </Link>
+                            <button
+                                type="button"
+                                onClick={handleLogout}
+                                className="rounded-full bg-white px-3 py-1.5 text-sm font-semibold text-neutral-950 hover:bg-neutral-200 sm:px-4 sm:py-2"
+                            >
+                                Logout
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            <Link to="/login" className="hidden rounded-full px-3 py-2 text-sm font-semibold text-neutral-200 hover:bg-white/10 sm:block lg:px-4">
+                                Log In
+                            </Link>
+
+                            <Link  to="/register" className="rounded-full bg-orange-500 px-3 py-1.5 text-sm font-semibold text-white hover:bg-orange-600 sm:px-4 sm:py-2">
+                                Sign Up
+                            </Link>
+                        </>
+                    )}
                 </div>
             </div>
 
@@ -102,20 +136,47 @@ function Navbar() {
                             ))}
                         </nav>
 
-                        <div className="grid grid-cols-2 gap-2 sm:hidden">
-                            <Link to="/login" className="rounded-full border border-white/10 px-4 py-2.5 text-sm font-semibold text-neutral-200 hover:bg-white/10">
+                        {isAuthenticated && user ? (
+                            <div className="space-y-2 sm:hidden">
+                                <Link
+                                    to={`/u/${user.username}`}
+                                    onClick={() => SetIsMenuOpen(false)}
+                                    className="block rounded-full border border-white/10 px-4 py-2.5 text-center text-sm font-semibold text-neutral-200 hover:bg-white/10"
+                                >
+                                    u/{user.username}
+                                </Link>
+
+                                <button
+                                    type="button"
+                                    onClick={handleLogout}
+                                    className="w-full rounded-full bg-white px-4 py-2.5 text-sm font-semibold text-neutral-950 hover:bg-neutral-200"
+                                >
+                                    Logout
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-2 gap-2 sm:hidden">
+                            <Link 
+                                to="/login"
+                                onClick={() => SetIsMenuOpen(false)}
+                                className="rounded-full border border-white/10 px-4 py-2.5 text-sm font-semibold text-neutral-200 hover:bg-white/10"
+                            >
                                 Log In
                             </Link>
 
-                            <Link to="/register" className="rounded-full bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-orange-600">
+                            <Link 
+                                to="/register"
+                                onClick={() => SetIsMenuOpen(false)} 
+                                className="rounded-full bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-orange-600"
+                            >
                                 Sign Up
                             </Link>
                         </div>
+                        )}
                     </div>
                 </div>
             )}
         </header>
     );
 }
-
 export default Navbar;

@@ -1,5 +1,5 @@
 import { api } from "./axios";
-import type { AuthResponse, LoginRequest, RegisterRequest } from "../types/auth";
+import type { AuthResponse, AuthUser, LoginRequest, RegisterRequest } from "../types/auth";
 
 export async function registerUser(data:RegisterRequest) {
     const response = await api.post<AuthResponse>("/auth/register", data);

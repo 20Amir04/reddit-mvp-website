@@ -11,6 +11,7 @@ import PostDetailsPage from "./pages/PostDetailsPage";
 import UserProfilePage from "./pages/UserProfilePage";
 import SearchResultsPage from "./pages/SearchResultsPage";
 import NotFoundPage from "./pages/NotFoundPage";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
@@ -23,11 +24,13 @@ function App() {
 
       <Route path="/communities" element={<CommunitiesPage/>} />
       <Route path="/r/:communityName" element={<CommunityDetailsPage/>} />
-      <Route path="/create-community" element={<CreateCommunityPage/>} />
+      
+      <Route element={<ProtectedRoute />}>
+        <Route path="/create-community" element={<CreateCommunityPage/>} />
+        <Route path="/create-post" element={<CreatePostPage/>} />
+      </Route>
 
-      <Route path="/create-post" element={<CreatePostPage/>} />
       <Route path="/post/:postId" element={<PostDetailsPage/>} />
-
       <Route path="/u/:username" element={<UserProfilePage/>} />
       <Route path="/search" element={<SearchResultsPage/>} />
 

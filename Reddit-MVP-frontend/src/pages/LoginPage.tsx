@@ -1,13 +1,13 @@
 import {useState } from "react";
 import type { FormEvent } from "react";
 import {Link, useNavigate} from "react-router-dom"
-import { loginUser } from "../api/authApi";
-import { saveToken } from "../utils/tokenStorage";
+import { useAuth } from "../context/AuthContext";
 
 function LoginPage() {
 
     const navigate = useNavigate();
-
+    const {login: loginWithCredentials} = useAuth();
+    
     const [login, setLogin] = useState("");
     const [password, setPassword] = useState("");
 
@@ -27,14 +27,11 @@ function LoginPage() {
         try {
             SetIsSubmitting(true);
 
-            const data = await loginUser({
-                login, 
-                password,
+            await loginWithCredentials({
+                login,
+                password
             });
-
-            saveToken(data.token);
-
-            navigate("/");
+            navigate("/");  
         } catch (error: any) {
             const message = 
                 error.response?.data?.message ?? "Login failed. Please try again.";
