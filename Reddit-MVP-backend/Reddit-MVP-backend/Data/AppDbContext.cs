@@ -8,9 +8,50 @@ namespace Reddit_MVP_backend.Data
     {
         public AppDbContext (DbContextOptions<AppDbContext> options) :  base(options)
         {
-                
         }
 
         public DbSet<TestEntity> TestEntities  { get; set; } 
+        public DbSet<Community> Communities { get; set; }
+        public DbSet<CommunityMember> CommunityMembers { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            builder.Entity<Community>()
+                .HasIndex(community => community.Name)
+                .IsUnique();
+
+            builder.Entity<Community>()
+                .Property(community => community.Name)
+                .HasMaxLength(50)
+                .IsRequired();
+
+            builder.Entity<Community>()
+                .Property(community => community.Description)
+                .HasMaxLength(500)
+                .IsRequired();
+
+            builder.Entity<Community>()
+                .HasOne(community => community.Creator)
+                .WithMany(user => user.CreatedCommunities)
+                .HasForeignKey(community => community.CreatorId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<CommunityMember>()
+                .HasKey(member => new {member.CommunityId, member.UserId});
+
+            builder.Entity<CommunityMember>()
+                .HasOne(member => member.Community)
+                .WithMany(community => community.Members)
+                .HasForeignKey(member => member.CommunityId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<CommunityMember>()
+                .HasOne(member => member.User)
+                .WithMany(user => user.CommunityMembership)
+                .HasForeignKey(member => member.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+        }
     }
 }

@@ -4,6 +4,9 @@ namespace Reddit_MVP_backend.Models
 {
     public class ApplicationUser : IdentityUser
     {
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public ICollection<Community> CreatedCommunities {  get; set; } = new List<Community>();
+        
+        public ICollection<CommunityMember> CommunityMembership { get; set; } = new List<CommunityMember>();
     }
 }
