@@ -2,6 +2,7 @@ import LeftSidebar from "../components/LeftSidebar";
 import RightSidebar from "../components/RightSidebar";
 import PostCard from "../components/PostCard";
 import { mockPosts } from "../data/mockPost";
+import { Link } from "react-router-dom";
 
 
 function HomePage() {
@@ -11,9 +12,12 @@ function HomePage() {
 
         <section className="min-w-0 flex-1">
           <div className="mb-4 rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4">
-            <button className="w-full rounded-full border border-white/10 bg-white/10 px-4 py-2.5 text-left text-sm text-neutral-400 hover:border-orange-500 hover:bg-white/[0.12] sm:px-5 sm:py-3">
+            <Link
+              to="create-post"
+              className="block w-full rounded-full border border-white/10 bg-white/10 px-4 py-2.5 text-left text-sm text-neutral-400 hover:border-orange-500 hover:bg-white/[0.12] sm:px-5 sm:py-3"
+            >
               Create a post
-            </button>
+            </Link>
           </div>
 
           <div className="mb-4 flex items-center gap-2 overflow-x-auto rounded-2xl border border-white/10 bg-white/5 p-2">
