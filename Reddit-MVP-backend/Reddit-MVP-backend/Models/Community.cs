@@ -10,5 +10,6 @@
         public string CreatorId { get; set; } = string.Empty;
         public ApplicationUser Creator { get; set; } = null!;
         public ICollection<CommunityMember> Members { get; set; } = new List<CommunityMember>();
+        public ICollection<Post> Posts { get; set; } = new List<Post>();
     }
 }

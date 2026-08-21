@@ -6,7 +6,7 @@ namespace Reddit_MVP_backend.Models
     {
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public ICollection<Community> CreatedCommunities {  get; set; } = new List<Community>();
-        
         public ICollection<CommunityMember> CommunityMembership { get; set; } = new List<CommunityMember>();
+        public ICollection<Post> Posts { get; set; } = new List<Post>();
     }
 }

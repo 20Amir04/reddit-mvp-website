@@ -68,6 +68,43 @@ namespace Reddit_MVP_backend.Controllers
             return Ok(community);
         }
 
+        [HttpGet("{name}/posts")]
+        public async Task<IActionResult> GetCommunityPosts(string name)
+        {
+            var normalizedName = name.Trim().ToLower();
+
+            var communityExists = await _context.Communities
+                .AnyAsync(community => community.Name == normalizedName);
+
+            if (!communityExists)
+            {
+                return NotFound(new { message = "Community not found" });
+            }
+
+            var posts = await _context.Posts
+                .Include(post => post.Author)
+                .Include(post => post.Community)
+                .Where(post => post.Community.Name == normalizedName)
+                .OrderByDescending(post => post.CreatedAt)
+                .Select(post => new
+                {
+                    post.Id,
+                    post.Title,
+                    post.Content,
+                    post.ImageUrl,
+                    post.CreatedAt,
+                    post.UpdatedAt,
+                    authorUsername = post.Author.UserName,
+                    communityId = post.CommunityId,
+                    communityName = post.Community.Name,
+                    voteScore = 0,
+                    commentsCount = 0
+                })
+                .ToListAsync();
+
+            return Ok(posts);
+        }
+
         [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateCommunity(CreateCommunityDto createCommunityDto)

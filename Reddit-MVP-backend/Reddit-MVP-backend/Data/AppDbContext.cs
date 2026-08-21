@@ -13,6 +13,7 @@ namespace Reddit_MVP_backend.Data
         public DbSet<TestEntity> TestEntities  { get; set; } 
         public DbSet<Community> Communities { get; set; }
         public DbSet<CommunityMember> CommunityMembers { get; set; }
+        public DbSet<Post> Posts { get; set;  }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -52,6 +53,28 @@ namespace Reddit_MVP_backend.Data
                 .WithMany(user => user.CommunityMembership)
                 .HasForeignKey(member => member.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Post>()
+                .Property(post => post.Title)
+                .HasMaxLength(200)
+                .IsRequired();
+
+            builder.Entity<Post>()
+                .Property(post => post.Content)
+                .HasMaxLength(5000)
+                .IsRequired();
+
+            builder.Entity<Post>()
+                .HasOne(post => post.Author)
+                .WithMany(user => user.Posts)
+                .HasForeignKey(post => post.AuthorId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Post>()
+                .HasOne(post => post.Community)
+                .WithMany(community => community.Posts)
+                .HasForeignKey(post => post.CommunityId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

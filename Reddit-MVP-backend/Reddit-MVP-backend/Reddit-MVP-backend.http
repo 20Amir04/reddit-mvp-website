@@ -69,3 +69,35 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hc
 ### Leave Community
 DELETE https://localhost:7117/api/communities/1/leave
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6ImUxYzIxODBkLTNjOGItNDM0Yi1hODgzLTU1MWNkNDM1MTQxNyIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJhbWlyIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvZW1haWxhZGRyZXNzIjoiYW1pckB0ZXN0LmNvbSIsImV4cCI6MTc4Njg0OTI0MCwiaXNzIjoiUmVkZGl0TXZwQXBpIiwiYXVkIjoiUmVkZGl0TXZwQ2xpZW50In0.D7aGPyQVjomFQTDxvJsqtSDsNb-ZzUyF5IuCCS8gwdY
+
+
+### Create post
+POST https://localhost:7117/api/posts
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6ImUxYzIxODBkLTNjOGItNDM0Yi1hODgzLTU1MWNkNDM1MTQxNyIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJhbWlyIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvZW1haWxhZGRyZXNzIjoiYW1pckB0ZXN0LmNvbSIsImV4cCI6MTc4NzM1OTUxMiwiaXNzIjoiUmVkZGl0TXZwQXBpIiwiYXVkIjoiUmVkZGl0TXZwQ2xpZW50In0.3_MNz9Jd8GIQvZ9xqzFfK4MzPgFmJwurRJIdJUe0wYg
+
+{
+  "communityId": 1,
+  "title": "First post in r/dotnet",
+  "content": "This is the first real post created through the API.",
+  "imageUrl": null
+}
+
+### Get all posts
+GET https://localhost:7117/api/posts
+
+### Get post by id
+GET https://localhost:7117/api/posts/1
+
+### Get community posts
+GET https://localhost:7117/api/communities/dotnet/posts
+
+### Update post
+PUT https://localhost:7117/api/posts/1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6ImUxYzIxODBkLTNjOGItNDM0Yi1hODgzLTU1MWNkNDM1MTQxNyIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJhbWlyIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvZW1haWxhZGRyZXNzIjoiYW1pckB0ZXN0LmNvbSIsImV4cCI6MTc4NzM1OTUxMiwiaXNzIjoiUmVkZGl0TXZwQXBpIiwiYXVkIjoiUmVkZGl0TXZwQ2xpZW50In0.3_MNz9Jd8GIQvZ9xqzFfK4MzPgFmJwurRJIdJUe0wYg
+{
+  "title": "Updated first post",
+  "content": "Updated content from the API.",
+  "imageUrl": null
+}
