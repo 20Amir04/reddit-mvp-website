@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { ArrowDownIcon, ArrowUpIcon, ChatBubbleOvalLeftIcon, BookmarkIcon, ShareIcon} from "@heroicons/react/24/outline";
 import type { Post } from "../types/post";
 
@@ -36,41 +37,61 @@ function PostCard({post}: PostCardProps) {
                                 <ArrowDownIcon className="h-4 w-4" />
                             </button>
                         </div>
-
-                        {post.tag && (
-                            <span className="rounded-full bg-orange-500/10 px-3 py-1 text-xs font-semibold text-orange-400">
-                                {post.tag}
-                            </span>
-                        )}
                     </div>
 
                     <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs" text-neutral-400>
-                        <span className="font-semibold text-neutral-200">
-                            r/{post.communityName}
-                        </span>
-                        <span>•</span>
-                        <span>{post.createdAt}</span>
-                    </div>
+                        <Link
+                            to={`/r/${post.communityName}`}
+                            className="font-semibold text-neutral-200 hover:text-orange-400"
+                        >
+                            r/{post.communityName}  
+                        </Link>
 
-                    <h2 className="mt-3 text-lg font-bold leading-snug text-white sm:text-xl">
-                        {post.title}
-                    </h2>
+                        <span>•</span>
+
+                        <Link
+                            to={`/u/${post.authorUsername}`}
+                            className="hover:text-neutral-200"
+                        >
+                            Posted by u/{post.authorUsername}
+                        </Link>
+
+                        <span>•</span>
+
+                        <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+                    </div>
+                    <Link
+                        to={`/post/${post.id}`}
+                    >
+                        <h2 className="mt-3 text-lg font-bold leading-snug text-white hover:text-orange-400 sm:text-xl">
+                            {post.title}
+                        </h2>
+                    </Link>
 
                     <p className="mt-3 line-clamp-3 text-sm leading-6 text-neutral-300 sm:text-[15px]">
                         {post.content}
                     </p>
 
-                    {post.tag && (
-                        <span className="mt-4 hidden rounded-full bg-orange-500/10 px-3 py-1 text-xs font-semibold text-orange-400 sm:inline-flex">
-                            {post.tag}
-                        </span>
+                    {post.imageUrl && (
+                        <Link
+                            to={`/post/${post.id}`}
+                        >
+                            <img
+                                src={post.imageUrl}
+                                alt={post.title}
+                                className="mt-4 max-h-96 w-full rounded-xl object-cover"
+                            />
+                        </Link>
                     )}
 
                     <div className="mt-5 flex flex-wrap items-center gap-2 text-sm text-neutral-400 sm:gap-3">
-                        <button className="flex items-center gap-1.5 rounded-full px-3 py-1.5 hover:bg-white/10">
-                            <ChatBubbleOvalLeftIcon className="h-4 w-4" />
+                        <Link
+                            to={`/post/${post.id}`}
+                            className="flex items-center gap-1.5 rounded-full px-3 py-1.5 hover:bg-white/10"
+                        >
+                            <ChatBubbleOvalLeftIcon className="h-4 w-4"/>
                             <span>{post.commentsCount} comments</span>
-                        </button>
+                        </Link>
 
                         <button className="flex items-center gap-1.5 rounded-full px-3 py-1.5 hover:bg-white/10">
                             <ShareIcon className="h-4 w-4" />
@@ -86,5 +107,5 @@ function PostCard({post}: PostCardProps) {
             </div>
         </article>
     );
-}
+}   
 export default PostCard;

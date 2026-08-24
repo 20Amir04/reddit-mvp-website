@@ -3,6 +3,9 @@ import { Link, useParams } from "react-router-dom";
 import { getCommunityByName, joinCommunity, leaveCommunity } from "../api/communityApi";
 import type { Community } from "../types/community";
 import { useAuth } from "../context/AuthContext";
+import { getCommunityPosts } from "../api/postApi";
+import type { Post } from "../types/post";
+import PostCard from "../components/PostCard";
 
 function CommunityDetailsPage() {
     const {communityName} = useParams();
@@ -10,6 +13,8 @@ function CommunityDetailsPage() {
 
     const [community, setCommunity] = useState<Community | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [posts, setPosts] = useState<Post[]>([]);
+    const [arePostsLoading, setArePostsLoading] = useState(true);
     const [actionMessage, setActionMessage] = useState("");
     const [error, setError] = useState("");
 
@@ -18,19 +23,25 @@ function CommunityDetailsPage() {
             if (!communityName) {
                 setError("Community name is missing.");
                 setIsLoading(false);
+                setArePostsLoading(false);
                 return;
             }
 
             try {
                 setIsLoading(true);
+                setArePostsLoading(true);
                 setError("");
 
                 const data = await getCommunityByName(communityName);
                 setCommunity(data);
+
+                const communityPosts = await getCommunityPosts(communityName);
+                setPosts(communityPosts);
             } catch {
                 setError("Community not found.");
             } finally {
                 setIsLoading(false);
+                setArePostsLoading(false);
             }
         }
 
@@ -196,19 +207,43 @@ function CommunityDetailsPage() {
 
             <section className="mt-5 rounded-2xl border border-white/10 bg-white/5 p-5 sm:p-6">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <h2 className="text-xl font-bold text-white">Community posts</h2>
+                    <div>      
+                        <h2 className="text-xl font-bold text-white">Community posts</h2>
 
-                    <p className="mt-2 text-sm text-neutral-400">
-                        Posts for this community will be added during the Posts phase.
-                    </p>
+                        <p className="mt-2 text-sm text-neutral-400">
+                            Posts created inside r/{community.name}.
+                        </p>
+                    </div>
+
+                    <Link
+                        to="/create-post"
+                        className="inline-flex items-center justify-center rounded-full bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-orange-600"
+                    >
+                        Create Post
+                    </Link>
                 </div>
 
-                <Link
-                    to="/create-post"
-                    className="inline-flex items-center justify-center rounded-full bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-orange-600"
-                >
-                    Create Post
-                </Link>
+                <div className="mt-5">
+                    {arePostsLoading && (
+                        <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-sm text-neutral-400">
+                            Loading posts...
+                        </div>
+                    )}
+
+                    {!arePostsLoading && posts.length === 0 && (
+                        <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-sm text-neutral-400">
+                            No posts in this community yet.
+                        </div>
+                    )}
+
+                    {!arePostsLoading && posts.length > 0 && (
+                        <div className="space-y-4">
+                            {posts.map((post) => (
+                                <PostCard key={post.id} post={post}/>
+                            ))}
+                        </div>
+                    )}
+                </div>
             </section>
         </main>
     );
