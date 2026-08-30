@@ -12,5 +12,6 @@
         public ApplicationUser Author { get; set; } = null;
         public int CommunityId { get; set; }
         public Community Community { get; set; } = null;
+        public ICollection<PostVote> Votes { get; set; } = new List<PostVote>();
     }
 }

@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using Reddit_MVP_backend.Models;
 using Reddit_MVP_backend.Data;
 using Reddit_MVP_backend.DTOs;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Reddit_MVP_backend.Controllers
 {
@@ -26,12 +25,15 @@ namespace Reddit_MVP_backend.Controllers
             var query = _context.Posts
                 .Include(post => post.Author)
                 .Include(post => post.Community)
+                .Include(post => post.Votes)
                 .AsQueryable();
 
             query = sort.ToLower() switch
             {
-            "popular" => query.OrderByDescending(post => post.CreatedAt),
-            _ => query.OrderByDescending(post => post.CreatedAt)
+            "popular" => query
+                .OrderByDescending(post => post.Votes.Sum(vote => vote.Value))
+                .ThenByDescending(post => post.CreatedAt),
+                _=> query.OrderByDescending(post => post.CreatedAt)
             };
 
             var posts = await query
@@ -46,7 +48,7 @@ namespace Reddit_MVP_backend.Controllers
                     authorUsername = post.Author.UserName,
                     communityId = post.CommunityId,
                     communityName = post.Community.Name,
-                    voteScore = 0,
+                    voteScore = post.Votes.Sum(vote => vote.Value),
                     commentsCount = 0
                 })
                 .ToListAsync();
@@ -60,6 +62,7 @@ namespace Reddit_MVP_backend.Controllers
             var post = await _context.Posts
                 .Include(post => post.Author)
                 .Include(post => post.Community)
+                .Include(post => post.Votes)
                 .Where(post => post.Id == id)
                 .Select(post => new
                 {
@@ -73,7 +76,7 @@ namespace Reddit_MVP_backend.Controllers
                     authorUsername = post.Author.UserName,
                     communityId = post.CommunityId,
                     communityName = post.Community.Name,
-                    voteScore = 0,
+                    voteScore = post.Votes.Sum(vote => vote.Value),
                     commentsCount = 0
                 })
                 .FirstOrDefaultAsync();
@@ -88,7 +91,7 @@ namespace Reddit_MVP_backend.Controllers
 
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> CreatePost(CreatePostDto createPostDto)
+        public async Task<IActionResult> CreatePost([FromBody] CreatePostDto createPostDto)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -156,8 +159,8 @@ namespace Reddit_MVP_backend.Controllers
                     post.ImageUrl,
                     post.CreatedAt,
                     post.UpdatedAt,
-                    communityId = post.CommunityId,
-                    communityName = post.Community.Name,
+                    communityId = community.Id,
+                    communityName = community.Name,
                     voteScore = 0,
                     commentsCount = 0
                 }
@@ -166,7 +169,7 @@ namespace Reddit_MVP_backend.Controllers
 
         [Authorize]
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> UpdatePost(int id, UpdatePostDto updatePostDto)
+        public async Task<IActionResult> UpdatePost(int id, [FromBody] UpdatePostDto updatePostDto)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -195,6 +198,16 @@ namespace Reddit_MVP_backend.Controllers
             if (string.IsNullOrWhiteSpace(updatePostDto.Content))
             {
                 return BadRequest(new { message = "Post content is required" });
+            }
+
+            if (updatePostDto.Title.Trim().Length > 200)
+            {
+                return BadRequest(new { message = "Post title cannot exceed 200 characters" });
+            }
+
+            if (updatePostDto.Content.Trim().Length > 5000)
+            {
+                return BadRequest(new { message = "Post content cannot exceed 5000 characters" });
             }
 
             post.Title = updatePostDto.Title.Trim();
@@ -236,6 +249,68 @@ namespace Reddit_MVP_backend.Controllers
             await _context.SaveChangesAsync();
 
             return Ok(new { message = "Post has been deleted successfully" });
+        }
+
+        [Authorize]
+        [HttpPost("{id:int}/vote")]
+        public async Task<IActionResult> VotePost(int id, [FromBody] VotePostDto votePostDto)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return Unauthorized(new { message = "Invalid token" });
+            }
+
+            if (votePostDto.Value != 1 && votePostDto.Value != -1)
+            {
+                return BadRequest(new { message = "Vote value must be 1 or -1" });
+            }
+
+            var post = await _context.Posts
+                .Include(post => post.Votes)
+                .FirstOrDefaultAsync(post => post.Id == id);
+
+            if (post == null)
+            {
+                return NotFound(new { message = "Post not found" });
+            }
+
+            var existingVote = await _context.PostVotes
+                .FirstOrDefaultAsync(vote => vote.PostId == id && vote.UserId == userId);
+
+            if (existingVote == null)
+            {
+                var vote = new PostVote
+                {
+                    PostId = id,
+                    UserId = userId,
+                    Value = votePostDto.Value,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                _context.PostVotes.Add(vote);
+            }
+            else if (existingVote.Value == votePostDto.Value)
+            {
+                _context.PostVotes.Remove(existingVote);
+            }
+            else
+            {
+                existingVote.Value = votePostDto.Value;
+            }
+
+            await _context.SaveChangesAsync();
+
+            var voteScore = await _context.PostVotes
+                .Where(vote => vote.PostId == id)
+                .SumAsync(vote => vote.Value);
+
+            return Ok(new
+            {
+                message = "Vote updated successfully",
+                voteScore
+            });
         }
     }
 }

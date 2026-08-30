@@ -14,6 +14,7 @@ namespace Reddit_MVP_backend.Data
         public DbSet<Community> Communities { get; set; }
         public DbSet<CommunityMember> CommunityMembers { get; set; }
         public DbSet<Post> Posts { get; set;  }
+        public DbSet<PostVote> PostVotes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -75,6 +76,25 @@ namespace Reddit_MVP_backend.Data
                 .WithMany(community => community.Posts)
                 .HasForeignKey(post => post.CommunityId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<PostVote>()
+                .HasKey(vote => new { vote.PostId, vote.UserId });
+
+            builder.Entity<PostVote>()
+                .HasOne(vote => vote.Post)
+                .WithMany(post => post.Votes)
+                .HasForeignKey(vote => vote.PostId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<PostVote>()
+                .HasOne(vote => vote.User)
+                .WithMany(user => user.PostVotes)
+                .HasForeignKey(vote => vote.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<PostVote>()
+                .Property(vote => vote.Value)
+                .IsRequired();
         }
     }
 }
