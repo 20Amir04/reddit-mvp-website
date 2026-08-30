@@ -30,3 +30,12 @@ export async function deletePost(postId: number) {
     const response = await api.delete<{message: string}>(`/posts/${postId}`);
     return response.data;
 }
+
+export async function votePost(postId: number, value: 1 | -1) {
+    const response = await api.post<{ message: string; voteScore: number}>(
+        `/posts/${postId}/vote`,
+        {value}
+    );
+
+    return response.data;
+}

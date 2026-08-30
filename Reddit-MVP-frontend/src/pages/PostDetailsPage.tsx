@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { deletePost, getPostById } from "../api/postApi";
+import { deletePost, getPostById, votePost } from "../api/postApi";
 import type { PostDetails } from "../types/post";
 import { useAuth } from "../context/AuthContext";
+import { ArrowDownIcon, ArrowUpIcon } from "@heroicons/react/24/outline";
 
 function PostDetailsPage() {
     const {postId} = useParams();
@@ -10,8 +11,10 @@ function PostDetailsPage() {
     const {user, isAuthenticated} = useAuth();
 
     const [post, setPost] = useState<PostDetails | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
+    const [voteScore, setVoteScore] = useState(0);
+    const [isLoading, setIsLoading] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [isVoting, setIsVoting] = useState(false);
     const [error, setError] = useState("");
 
     useEffect(() => {
@@ -30,6 +33,7 @@ function PostDetailsPage() {
 
                 const data = await getPostById(numericPostId);
                 setPost(data);
+                setVoteScore(data.voteScore);
             } catch {
                 setError("Post not found.");
             } finally {
@@ -64,6 +68,33 @@ function PostDetailsPage() {
             setError(message);
         } finally {
             setIsDeleting(false);
+        }
+    }
+
+    async function handleVote(value: 1 | -1) {
+        if (!post) {
+            return;
+        }
+
+        setError("");
+
+        if (!isAuthenticated) {
+            setError("Log in to vote.");
+            return;
+        }
+
+        try {
+            setIsVoting(true);
+
+            const response = await votePost(post.id, value);
+
+            setVoteScore(response.voteScore);
+        } catch (error: any) {
+            const message = error.response?.data?.message ?? "Failed to vote on this post.";
+
+            setError(message);
+        } finally {
+            setIsVoting(false);
         }
     }
 
@@ -135,10 +166,30 @@ function PostDetailsPage() {
                 )}
 
                 <div className="mt-6 flex flex-wrap items-center gap-3 text-sm text-neutral-400">
-                    <span className="rounded-full bg-black/20 px-3 py-1.5">
-                        {post.voteScore} votes
-                    </span>
+                    <div className="flex items-center gap-2 rounded-full bg-black/20 px-3 py-1.5">
+                        <button
+                            type="button"
+                            onClick={() => handleVote(1)}
+                            disabled={isVoting}
+                            className="text-neutral-400 hover:text-orange-500 disabled:cursor-not-allowed disabled:opacity-50"
+                            aria-label="Upvote post"
+                        >
+                            <ArrowUpIcon className="h-4 w-4"/>
+                        </button>
 
+                        <span className="font-semibold text-white">{voteScore}</span>
+
+                        <button
+                            type="button"
+                            onClick={() => handleVote(-1)}
+                            disabled={isVoting}
+                            className="text-neutral-400 hover:text-blue-400 disabled:cursor-not-allowed disabled:opacity-50"
+                            aria-label="Downvote post"
+                        >
+                            <ArrowDownIcon className="h-4 w-4"/>
+                        </button>
+                    </div>
+                    
                     <span className="rounded-full bg-black/20 px-3 py-1.5">
                         {post.commentsCount} comments
                     </span>
