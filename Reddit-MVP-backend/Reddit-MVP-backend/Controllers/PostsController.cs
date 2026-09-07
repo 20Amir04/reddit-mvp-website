@@ -26,6 +26,7 @@ namespace Reddit_MVP_backend.Controllers
                 .Include(post => post.Author)
                 .Include(post => post.Community)
                 .Include(post => post.Votes)
+                .Include(post => post.Comments)
                 .AsQueryable();
 
             query = sort.ToLower() switch
@@ -49,7 +50,7 @@ namespace Reddit_MVP_backend.Controllers
                     communityId = post.CommunityId,
                     communityName = post.Community.Name,
                     voteScore = post.Votes.Sum(vote => vote.Value),
-                    commentsCount = 0
+                    commentsCount = post.Comments.Count
                 })
                 .ToListAsync();
 
@@ -63,6 +64,7 @@ namespace Reddit_MVP_backend.Controllers
                 .Include(post => post.Author)
                 .Include(post => post.Community)
                 .Include(post => post.Votes)
+                .Include(post => post.Comments)
                 .Where(post => post.Id == id)
                 .Select(post => new
                 {
@@ -77,7 +79,7 @@ namespace Reddit_MVP_backend.Controllers
                     communityId = post.CommunityId,
                     communityName = post.Community.Name,
                     voteScore = post.Votes.Sum(vote => vote.Value),
-                    commentsCount = 0
+                    commentsCount = post.Comments.Count
                 })
                 .FirstOrDefaultAsync();
 

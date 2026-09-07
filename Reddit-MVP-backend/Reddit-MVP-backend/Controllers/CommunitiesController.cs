@@ -84,6 +84,7 @@ namespace Reddit_MVP_backend.Controllers
             var posts = await _context.Posts
                 .Include(post => post.Author)
                 .Include(post => post.Community)
+                .Include(post => post.Comments)
                 .Where(post => post.Community.Name == normalizedName)
                 .OrderByDescending(post => post.CreatedAt)
                 .Select(post => new
@@ -98,7 +99,7 @@ namespace Reddit_MVP_backend.Controllers
                     communityId = post.CommunityId,
                     communityName = post.Community.Name,
                     voteScore = 0,
-                    commentsCount = 0
+                    commentsCount = post.Comments.Count
                 })
                 .ToListAsync();
 

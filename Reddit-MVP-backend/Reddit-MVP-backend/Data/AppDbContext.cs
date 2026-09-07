@@ -10,11 +10,11 @@ namespace Reddit_MVP_backend.Data
         {
         }
 
-        public DbSet<TestEntity> TestEntities  { get; set; } 
         public DbSet<Community> Communities { get; set; }
         public DbSet<CommunityMember> CommunityMembers { get; set; }
         public DbSet<Post> Posts { get; set;  }
         public DbSet<PostVote> PostVotes { get; set; }
+        public DbSet<Comment> Comments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -95,6 +95,29 @@ namespace Reddit_MVP_backend.Data
             builder.Entity<PostVote>()
                 .Property(vote => vote.Value)
                 .IsRequired();
+
+            builder.Entity<Comment>()
+                .Property(comment => comment.Content)
+                .HasMaxLength(3000)
+                .IsRequired();
+
+            builder.Entity<Comment>()
+                .HasOne(comment => comment.Post)
+                .WithMany(post => post.Comments)
+                .HasForeignKey(comment => comment.PostId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Comment>()
+                .HasOne(comment => comment.Author)
+                .WithMany(user => user.Comments)
+                .HasForeignKey(comment => comment.AuthorId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Comment>()
+                .HasOne(comment => comment.ParentComment)
+                .WithMany(comment => comment.Replies)
+                .HasForeignKey(comment => comment.ParentCommentId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

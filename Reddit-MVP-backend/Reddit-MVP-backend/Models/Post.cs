@@ -9,9 +9,10 @@
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
         public string AuthorId { get; set; } = string.Empty;
-        public ApplicationUser Author { get; set; } = null;
+        public ApplicationUser Author { get; set; } = null!;
         public int CommunityId { get; set; }
-        public Community Community { get; set; } = null;
+        public Community Community { get; set; } = null!;
         public ICollection<PostVote> Votes { get; set; } = new List<PostVote>();
+        public ICollection<Comment> Comments { get; set; } = new List<Comment>();
     }
 }
