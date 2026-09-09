@@ -3,6 +3,10 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { deletePost, getPostById, votePost } from "../api/postApi";
 import type { PostDetails } from "../types/post";
 import { useAuth } from "../context/AuthContext";
+import { createComment, deleteComment, getPostComments, updateComment } from "../api/commentApi";
+import type { Comment } from "../types/comment";
+import CommentCard from "../components/CommentCard";
+import CommentForm from "../components/CommentForm";
 import { ArrowDownIcon, ArrowUpIcon } from "@heroicons/react/24/outline";
 
 function PostDetailsPage() {
@@ -12,6 +16,11 @@ function PostDetailsPage() {
 
     const [post, setPost] = useState<PostDetails | null>(null);
     const [voteScore, setVoteScore] = useState(0);
+    
+    const [comments, setComments] = useState<Comment[]>([]);
+
+    const [areCommentsLoading, setAreCommentsLoading] = useState(true);
+    const [isCommentSubmitting, setIsCommentSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [isVoting, setIsVoting] = useState(false);
@@ -24,20 +33,32 @@ function PostDetailsPage() {
             if (!numericPostId) {
                 setError("Invalid post id.");
                 setIsLoading(false);
+                setAreCommentsLoading(false);
                 return;
             }
 
             try {
                 setIsLoading(true);
+                setAreCommentsLoading(true);
                 setError("");
 
                 const data = await getPostById(numericPostId);
                 setPost(data);
                 setVoteScore(data.voteScore);
+
+                const commentsData = await getPostComments(numericPostId);
+
+                if (Array.isArray(commentsData)) {
+                    setComments(commentsData);
+                } else {
+                    setComments([]);
+                }
+                
             } catch {
                 setError("Post not found.");
             } finally {
                 setIsLoading(false);
+                setAreCommentsLoading(false);
             }
         }
 
@@ -120,6 +141,143 @@ function PostDetailsPage() {
 
     if (!post) {
         return null;
+    }
+
+    async function handleCreateComment(content: string) {
+        if (!post) {
+            return;
+        }
+
+        setError("");
+
+        if (!isAuthenticated) {
+            setError("Log in to comment.");
+            return;
+        }
+
+        try {
+            setIsCommentSubmitting(true);
+
+            const response = await createComment(post.id, {
+                content,
+                parentCommentId: null,
+            });
+
+            setComments((currentComments) => [response.comment, ...currentComments]);
+
+            setPost({
+                ...post,
+                commentsCount: post.commentsCount + 1,
+            });
+        } catch (error:any) {
+            const message = error.response?.data?.message ?? "Failed to create comment.";
+
+            setError(message);
+        } finally {
+            setIsCommentSubmitting(false);
+        }
+    }
+
+    async function handleReply(parentCommentId: number, content: string) {
+        if (!post) {
+            return;
+        }
+
+        const response = await createComment(post.id, {
+            content,
+            parentCommentId,
+        });
+
+        const reply = {
+            id: response.comment.id,
+            content: response.comment.content,
+            createdAt: response.comment.createdAt,
+            updatedAt: response.comment.updatedAt,
+            postId: response.comment.postId,
+            parentCommentId: response.comment.parentCommentId,
+            authorId: response.comment.authorId,
+            authorUsername: response.comment.authorUsername,
+        };
+
+        setComments((currentComments) => currentComments.map((comment) => comment.id === parentCommentId ? {
+            ...comment,
+            replies: [...comment.replies, reply],
+        }
+        : comment )
+        );
+
+        setPost({
+            ...post,
+            commentsCount: post.commentsCount + 1,
+        });
+    }
+
+    async function handleUpdateComment(commentId: number, content: string) {
+        await updateComment(commentId, {content});
+
+        setComments((currentComments) => 
+            currentComments.map((comment) => {
+                if (comment.id === commentId) {
+                    return {
+                        ...comment,
+                        content,
+                        updatedAt: new Date().toISOString(),
+                    };
+                }
+
+                return {
+                    ...comment,
+                    replies: comment.replies.map((reply) => 
+                        reply.id === commentId
+                            ? {
+                                ...reply,
+                                content,
+                                updatedAt: new Date().toISOString(),
+                            }
+                            : reply
+                        ),
+                };
+            })
+        );
+    }
+
+    async function handleDeleteComment(commentId: number) {
+        await deleteComment(commentId);
+
+        setComments((currentComments) => {
+            const parentComment = currentComments.find(
+                (comment) => comment.id === commentId
+            );
+
+            if (parentComment) {
+                const removedCount = 1 + parentComment.replies.length;
+
+                setPost((currentPost) => 
+                    currentPost
+                    ?   {
+                        ...currentPost,
+                        commentsCount: Math.max(currentPost.commentsCount - removedCount, 0),
+                    }
+                : currentPost
+            );
+
+            return currentComments.filter((comment) => comment.id !== commentId)
+            }
+
+            setPost((currentPost) => 
+                currentPost
+                    ? {
+                        ...currentPost,
+                        commentsCount: Math.max(currentPost.commentsCount - 1, 0),
+                    }
+                    : currentPost
+            );
+
+            return currentComments.map((comment) => ({
+                ...comment,
+                replies: comment.replies.filter((reply) => reply.id !== commentId),
+            }));
+        });
     }
 
     const isAuthor = isAuthenticated && user?.username === post.authorUsername;
@@ -218,9 +376,47 @@ function PostDetailsPage() {
             <section className="mt-5 rounded-2xl border border-white/10 bg-white/5 p-5 sm:p-6">
                 <h2 className="text-xl font-bold text-white">Comments</h2>               
 
-                <p className="mt-2 text-sm text-neutral-400">
-                    Comments will appear here later.
-                </p>
+                <div className="mt-5">
+                    {isAuthenticated ? (
+                        <CommentForm
+                            isSubmitting={isCommentSubmitting}
+                            onSubmit={handleCreateComment}
+                        />
+                    ) : (
+                        <div className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-neutral-400">
+                            Log in to write a comment.
+                        </div>
+                    )}
+                </div>
+
+                <div className="mt-6 space-y-4">
+                    {areCommentsLoading && (
+                        <div className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-neutral-400">
+                            Loading comments...
+                        </div>
+                    )}
+
+                    {!areCommentsLoading && comments.length === 0 && (
+                        <div className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-neutral-400">
+                            No comments yet. Be the first one to comment.
+                        </div>
+                    )}
+
+                    {!areCommentsLoading &&
+                        Array.isArray(comments) && 
+                        comments.map((comment) => (
+                            <CommentCard 
+                                key={comment.id}
+                                comment={{
+                                    ...comment,
+                                    replies: comment.replies ?? [],
+                                }}
+                                onReply={handleReply}
+                                onUpdate={handleUpdateComment}
+                                onDelete={handleDeleteComment}
+                            />
+                        ))}
+                </div>
             </section>
         </main>
     );
