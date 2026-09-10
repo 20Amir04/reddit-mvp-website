@@ -150,3 +150,12 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hc
 
 ### Get user posts
 GET https://localhost:7117/api/users/amir/posts
+
+### Search all
+GET https://localhost:7117/api/search?query=dotnet&type=all
+
+### Search posts
+GET https://localhost:7117/api/search?query=post&type=posts
+
+### Search communities
+GET https://localhost:7117/api/search?query=web&type=communities
