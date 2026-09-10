@@ -75,7 +75,7 @@ namespace Reddit_MVP_backend.Controllers
                 })
                 .ToList();
 
-            return Ok();
+            return Ok(result);
         }
 
         [Authorize]
@@ -117,7 +117,7 @@ namespace Reddit_MVP_backend.Controllers
                     return NotFound(new { message = "Parent comment not found" });
                 }
 
-                if (parentComment.ParentCommentId != postId)
+                if (parentComment.PostId != postId)
                 {
                     return BadRequest(new { message = "Parent comment does not belong to this post" });
                 }
