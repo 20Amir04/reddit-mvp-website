@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {Link, useNavigate} from "react-router-dom"
+import type { FormEvent } from "react";
 import {
     Bars3Icon,
     XMarkIcon,
@@ -18,6 +19,7 @@ const mobileMenuItems = [
 function Navbar() {
     const navigate = useNavigate();
     const [isMenuOpen, SetIsMenuOpen] = useState(false);    
+    const [searchQuery, setSearchQuery] = useState("");
     
         const {user, isAuthenticated, logout} = useAuth();
 
@@ -25,6 +27,19 @@ function Navbar() {
         logout();
         SetIsMenuOpen(false);
         navigate("/");
+    }
+
+    function handleSearchSubmit(event: FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+
+        const trimmedQuery = searchQuery.trim();
+
+        if (!trimmedQuery) {
+            return;
+        }
+
+        SetIsMenuOpen(false);
+        navigate(`/search?q=${encodeURIComponent(trimmedQuery)}&type=all`);
     }
 
     return(
@@ -56,18 +71,23 @@ function Navbar() {
                         Reddit MVP
                     </span>
                 </Link>
-
-                <div className="hidden flex-1 justify-center md:flex">
+                
+                <form
+                    onSubmit={handleSearchSubmit}
+                    className="hidden flex-1 justify-center md:flex"
+                >
                     <div className="relative w-full max-w-md lg:max-w-xl">
                         <MagnifyingGlassIcon className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-neutral-400" />
 
                         <input
                             type="text"
+                            value={searchQuery}
+                            onChange={(event) => setSearchQuery(event.target.value)}
                             placeholder="Search Reddit MVP"
                             className="w-full rounded-full border border-white/10 bg-white/10 py-2 pl-11 pr-4 text-sm text-white outline-none placeholder:text-neutral-400 focus:border-orange-500"
                         />
                     </div>
-                </div>
+                </form>
 
                 <div className="flex flex-1 justify-end md:hidden">
                     <button 
@@ -113,15 +133,18 @@ function Navbar() {
             {isMenuOpen && (
                 <div className="border-t border-white/10 bg-neutral-950 px-3 py-4 lg:hidden">
                     <div className="mx-auto max-w-7xl space-y-4">
-                        <div className="relative md:hidden">
+                        <form onSubmit={handleSearchSubmit} className="relative md:hidden">
                             <MagnifyingGlassIcon className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-neutral-400" />
 
                             <input
                                 type="text"
+                                value={searchQuery}
+                                onChange={(event) => setSearchQuery(event.target.value)}
                                 placeholder="Search Reddit MVP"
                                 className="w-full rounded-full border border-white/10 bg-white/10 py-2.5 pl-11 pr-4 text-sm text-white outline-none placeholder:text-neutral-400 focus:border-orange-500"
                             />
-                        </div>
+
+                        </form>
 
                         <nav className="space-y-1">
                             {mobileMenuItems.map((item) => (
