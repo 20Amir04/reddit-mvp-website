@@ -44,6 +44,8 @@ namespace Reddit_MVP_backend.Controllers
         [HttpGet("{name}")]
         public async Task<IActionResult> GetCommunityByName(string name)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
             var community = await _context.Communities
                 .Include(community => community.Creator)
                 .Include(community => community.Members)
@@ -56,7 +58,9 @@ namespace Reddit_MVP_backend.Controllers
                     community.BannerImageUrl,
                     community.CreatedAt,
                     creatorUsername = community.Creator.UserName,
-                    membersCount = community.Members.Count
+                    membersCount = community.Members.Count,
+                    isMember = !string.IsNullOrWhiteSpace(userId) &&
+                        community.Members.Any(member => member.UserId == userId)
                 })
                 .FirstOrDefaultAsync();
 
@@ -218,7 +222,7 @@ namespace Reddit_MVP_backend.Controllers
             _context.CommunityMembers.Add(membership);
             await _context.SaveChangesAsync();
 
-            return Ok(new { message = "Joined community successfully" });
+            return Ok(new { message = "Joined community successfully", isMember = true });
         }
 
         [Authorize]
@@ -255,7 +259,7 @@ namespace Reddit_MVP_backend.Controllers
             _context.CommunityMembers.Remove(membership);
             await _context.SaveChangesAsync();
 
-            return Ok(new { message = "Left Community successfully" });
+            return Ok(new { message = "Left Community successfully", isMember = false });
         }
     }
 }
