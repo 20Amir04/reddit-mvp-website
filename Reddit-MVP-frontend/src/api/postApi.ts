@@ -39,3 +39,21 @@ export async function votePost(postId: number, value: 1 | -1) {
 
     return response.data;
 }
+
+export async function savePost(postId: number) {
+    const response = await api.post<{message: string}>(`/posts/${postId}/save`);
+    return response.data;
+}
+
+export async function unsavePost(postId: number) {
+    const response = await api.delete<{message: string}>(
+        `/posts/${postId}/save`
+    );
+
+    return response.data;
+}
+
+export async function getMySavedPosts() {
+    const response = await api.get<Post[]>("/users/me/saved-posts");
+    return response.data;
+}

@@ -10,6 +10,7 @@ export type Post = {
     voteScore: number;
     commentsCount: number;
     createdAt: string;
+    isSaved: boolean;
 };
 
 export type PostDetails = Post & {

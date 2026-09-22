@@ -12,6 +12,7 @@ import UserProfilePage from "./pages/UserProfilePage";
 import SearchResultsPage from "./pages/SearchResultsPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import ProtectedRoute from "./components/ProtectedRoute";
+import SavedPostsPage from "./pages/SavedPostsPage";
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
       <Route path="/post/:postId" element={<PostDetailsPage/>} />
       <Route path="/u/:username" element={<UserProfilePage/>} />
       <Route path="/search" element={<SearchResultsPage/>} />
+      <Route path="/saved" element={<SavedPostsPage/>} />
 
       <Route path="*" element={<NotFoundPage/>} />
     </Routes>

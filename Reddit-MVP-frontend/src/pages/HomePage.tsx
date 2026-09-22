@@ -69,10 +69,6 @@ function HomePage() {
             >
               Popular
             </button>
-
-            <button className="shrink-0 rounded-full px-4 py-2 text-sm font-semibold text-neutral-300 hover:bg-white/10">
-              Hot
-            </button>
           </div>
           
           {isLoading && (

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowDownIcon, ArrowUpIcon, ChatBubbleOvalLeftIcon, BookmarkIcon, ShareIcon} from "@heroicons/react/24/outline";
 import type { Post } from "../types/post";
-import { votePost } from "../api/postApi";
+import { votePost, savePost, unsavePost } from "../api/postApi";
 import { useAuth } from "../context/AuthContext";
 
 
@@ -14,6 +14,9 @@ function PostCard({post}: PostCardProps) {
     const {isAuthenticated} = useAuth();
 
     const [voteScore, setVoteScore] = useState(post.voteScore);
+    const [isSaved, setIsSaved] = useState(post.isSaved);
+    const [isSaving, setIsSaving] = useState(false);
+
     const [error, setError] = useState("");
     const [isVoting, setIsVoting] = useState(false);
 
@@ -37,6 +40,34 @@ function PostCard({post}: PostCardProps) {
             setError(message);
         } finally {
             setIsVoting(false);
+        }
+    }
+
+    async function handleSave() {
+        setError("");
+
+        if (!isAuthenticated) {
+            setError("Log in to save post.");
+            return;
+        }
+
+        try {
+            setIsSaving(true)
+
+            if (isSaved) {
+                await unsavePost(post.id);
+                setIsSaved(false);
+            } else {
+                await savePost(post.id);
+                setIsSaved(true);
+            }
+        } catch (error: any) {
+            const message = 
+                error.response?.data?.message ?? "Failed to update saved post.";
+
+            setError(message);
+        } finally {
+            setIsSaving(false);
         }
     }
 
@@ -155,9 +186,18 @@ function PostCard({post}: PostCardProps) {
                             <span>Share</span>
                         </button>
 
-                        <button className="flex items-center gap-1.5 rounded-full px-3 py-1.5 hover:bg-white/10">
+                        <button
+                            type="button"
+                            onClick={handleSave}
+                            disabled={isSaving} 
+                            className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 disabled:cursor-not-allowed disabled:opacity-60 ${
+                                isSaved
+                                ? "bg-white/10 text-orange-400"
+                                : "text-neutral-400 hover:bg-white/10"
+                            }`}
+                        >
                             <BookmarkIcon className="h-4 w-4" />
-                            <span>Save</span>
+                            <span>{isSaved ? "Saved" : "Save"}</span>
                         </button>
                     </div>
 

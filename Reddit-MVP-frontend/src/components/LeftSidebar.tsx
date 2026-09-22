@@ -2,10 +2,9 @@ import { NavLink } from "react-router-dom";
 
 const menuItems = [
     {label: "Home", path: "/"}, 
-    {label: "Popular", path: "/"}, 
     {label: "Explore", path: "/communities"}, 
     {label: "Communities", path: "/communities"}, 
-    {label: "Saved", path: "/"},
+    {label: "Saved", path: "/saved"},
 ]; 
 
 function LeftSidebar() {
