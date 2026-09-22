@@ -6,6 +6,7 @@ export type Community = {
     createdAt: string;
     creatorUsername: string;
     membersCount: number;
+    isMember: boolean;
 };
 
 export type CreateCommunityRequest = {

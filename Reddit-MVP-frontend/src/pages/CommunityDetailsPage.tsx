@@ -68,6 +68,7 @@ function CommunityDetailsPage() {
             setCommunity({
                 ...community,
                 membersCount: community.membersCount + 1,
+                isMember: true,
             });
         } catch (error: any) {
             const message = 
@@ -98,6 +99,7 @@ function CommunityDetailsPage() {
             setCommunity({
                 ...community,
                 membersCount: Math.max(community.membersCount - 1, 0),
+                isMember: false,
             });
         } catch (error: any) {
             const message = error.response?.data?.message ?? "Failed to leave community.";
@@ -167,21 +169,23 @@ function CommunityDetailsPage() {
                         </div>
 
                         <div className="flex shrink-0 gap-2">
-                            <button
-                                type="button"
-                                onClick={handleJoin}
-                                className="rounded-full bg-white px-5 py-2 text-sm font-semibold text-neutral-950 hover:bg-neutral-200"
-                            >
-                                Join
-                            </button>
-
-                            <button
-                                type="button"
-                                onClick={handleLeave}
-                                className="rounded-full border border-white/10 px-5 py-2 text-sm font-semibold text-neutral-200 hover:bg-white/10"
-                            >
-                                Leave
-                            </button>
+                            {community.isMember ? (
+                                <button
+                                    type="button"
+                                    onClick={handleLeave}
+                                    className="rounded-full border border-white/10 px-5 py-2 text-sm font-semibold text-neutral-200 hover:bg-white/10"
+                                >
+                                    Leave
+                                </button>
+                            ) : (
+                                <button
+                                    type="button"
+                                    onClick={handleJoin}
+                                    className="rounded-full bg-white px-5 py-2 text-sm font-semibold text-neutral-950 hover:bg-neutral-200"
+                                >
+                                    Join
+                                </button>
+                            )}
                         </div>
                     </div>
 
