@@ -22,6 +22,8 @@ namespace Reddit_MVP_backend.Controllers
         [HttpGet]
         public async Task<IActionResult> GetPosts([FromQuery] string sort = "new")
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
             var query = _context.Posts
                 .Include(post => post.Author)
                 .Include(post => post.Community)
@@ -50,7 +52,8 @@ namespace Reddit_MVP_backend.Controllers
                     communityId = post.CommunityId,
                     communityName = post.Community.Name,
                     voteScore = post.Votes.Sum(vote => vote.Value),
-                    commentsCount = post.Comments.Count
+                    commentsCount = post.Comments.Count,
+                    isSaved = !string.IsNullOrWhiteSpace(userId) && post.SavedByUsers.Any(savedPost => savedPost.UserId == userId)
                 })
                 .ToListAsync();
 
@@ -60,11 +63,14 @@ namespace Reddit_MVP_backend.Controllers
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetPostById(int id)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
             var post = await _context.Posts
                 .Include(post => post.Author)
                 .Include(post => post.Community)
                 .Include(post => post.Votes)
                 .Include(post => post.Comments)
+                .Include(post => post.SavedByUsers)
                 .Where(post => post.Id == id)
                 .Select(post => new
                 {
@@ -79,7 +85,8 @@ namespace Reddit_MVP_backend.Controllers
                     communityId = post.CommunityId,
                     communityName = post.Community.Name,
                     voteScore = post.Votes.Sum(vote => vote.Value),
-                    commentsCount = post.Comments.Count
+                    commentsCount = post.Comments.Count,
+                    isSaved = !string.IsNullOrWhiteSpace(userId) && post.SavedByUsers.Any(savedPost => savedPost.UserId == userId)
                 })
                 .FirstOrDefaultAsync();
 
@@ -313,6 +320,68 @@ namespace Reddit_MVP_backend.Controllers
                 message = "Vote updated successfully",
                 voteScore
             });
+        }
+
+        [Authorize]
+        [HttpPost("{id:int}/save")]
+        public async Task<IActionResult> SavePost(int id)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return Unauthorized(new { message = "Invalid token" });
+            }
+
+            var postExists = await _context.Posts.AnyAsync(post => post.Id == id);
+
+            if (!postExists)
+            {
+                return NotFound(new { message = "Post not found" });
+            }
+
+            var alreadySaved = await _context.SavedPosts.AnyAsync(savedPost => savedPost.PostId == id && savedPost.UserId == userId);
+
+            if (alreadySaved)
+            {
+                return BadRequest(new { message = "Post already saved" });
+            }
+
+            var savedPost = new SavedPost
+            {
+                PostId = id,
+                UserId = userId,
+                SavedAt = DateTime.UtcNow
+            };
+
+            _context.SavedPosts.Add(savedPost);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Post saved successfully!" });
+        }
+
+        [Authorize]
+        [HttpDelete("{id:int}/save")]
+        public async Task<IActionResult> UnsavePost(int id)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return Unauthorized(new { message = "Invalid token" });
+            }
+
+            var savedPost = await _context.SavedPosts.FirstOrDefaultAsync(savedPost => savedPost.PostId == id && savedPost.UserId == userId);
+
+            if (savedPost == null)
+            {
+                return NotFound(new { message = "Saved post not found" });
+            }
+
+            _context.SavedPosts.Remove(savedPost);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Post removed from saved!" });
         }
     }
 }

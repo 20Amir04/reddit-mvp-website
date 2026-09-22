@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Reddit_MVP_backend.Data;
@@ -50,6 +51,8 @@ namespace Reddit_MVP_backend.Controllers
         [HttpGet("{username}/posts")]
         public async Task<IActionResult> GetUserPosts(string username)
         {
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
             var normalizedUsername = username.Trim().ToLower();
 
             var userExists = await _context.Users
@@ -65,6 +68,7 @@ namespace Reddit_MVP_backend.Controllers
                 .Include(post => post.Community)
                 .Include(post => post.Votes)
                 .Include(post => post.Comments)
+                .Include(post => post.SavedByUsers)
                 .Where(post => post.Author.UserName != null && post.Author.UserName.ToLower() == normalizedUsername)
                 .OrderByDescending(post => post.CreatedAt)
                 .Select(post => new
@@ -79,7 +83,50 @@ namespace Reddit_MVP_backend.Controllers
                     communityId = post.CommunityId,
                     communityName = post.Community.Name,
                     voteScore = post.Votes.Sum(vote => vote.Value),
-                    commentsCount = post.Comments.Count
+                    commentsCount = post.Comments.Count,
+                    isSaved = !string.IsNullOrWhiteSpace(currentUserId) && post.SavedByUsers.Any(savedPost => savedPost.UserId == currentUserId)
+                })
+                .ToListAsync();
+
+            return Ok(posts);
+        }
+
+        [Authorize]
+        [HttpGet("me/saved-posts")]
+        public async Task<IActionResult> GetMySavedPosts()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return Unauthorized(new { message = "Invalid token" });
+            }
+
+            var posts = await _context.SavedPosts
+                .Include(savedPost => savedPost.Post)
+                    .ThenInclude(post => post.Author)
+                .Include(savedPost => savedPost.Post)
+                    .ThenInclude(post => post.Community)
+                .Include(savedPost => savedPost.Post)
+                    .ThenInclude(post => post.Votes)
+                .Include(savedPost => savedPost.Post)
+                    .ThenInclude(post => post.Comments)
+                .Where(savedPost => savedPost.UserId == userId)
+                .OrderByDescending(savedPost => savedPost.SavedAt)
+                .Select(savedPost => new
+                {
+                    savedPost.Post.Id,
+                    savedPost.Post.Title,
+                    savedPost.Post.Content,
+                    savedPost.Post.ImageUrl,
+                    savedPost.Post.CreatedAt,
+                    savedPost.Post.UpdatedAt,
+                    authorUsername = savedPost.Post.Author.UserName,
+                    communityId = savedPost.Post.CommunityId,
+                    communityName = savedPost.Post.Community.Name,
+                    voteScore = savedPost.Post.Votes.Sum(vote => vote.Value),
+                    commentsCount = savedPost.Post.Comments.Count,
+                    isSaved = true
                 })
                 .ToListAsync();
 

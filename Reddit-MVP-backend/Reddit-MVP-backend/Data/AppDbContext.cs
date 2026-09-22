@@ -15,6 +15,7 @@ namespace Reddit_MVP_backend.Data
         public DbSet<Post> Posts { get; set;  }
         public DbSet<PostVote> PostVotes { get; set; }
         public DbSet<Comment> Comments { get; set; }
+        public DbSet<SavedPost> SavedPosts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -117,6 +118,21 @@ namespace Reddit_MVP_backend.Data
                 .HasOne(comment => comment.ParentComment)
                 .WithMany(comment => comment.Replies)
                 .HasForeignKey(comment => comment.ParentCommentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<SavedPost>()
+                .HasKey(savedPost => new { savedPost.PostId, savedPost.UserId });
+
+            builder.Entity<SavedPost>()
+                .HasOne(savedPost => savedPost.Post)
+                .WithMany(post => post.SavedByUsers)
+                .HasForeignKey(savedPost => savedPost.PostId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<SavedPost>()
+                .HasOne(savedPost => savedPost.User)
+                .WithMany(user => user.SavedPosts)
+                .HasForeignKey(savedPost => savedPost.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

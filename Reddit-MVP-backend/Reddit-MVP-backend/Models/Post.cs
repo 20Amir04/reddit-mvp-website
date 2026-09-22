@@ -14,5 +14,6 @@
         public Community Community { get; set; } = null!;
         public ICollection<PostVote> Votes { get; set; } = new List<PostVote>();
         public ICollection<Comment> Comments { get; set; } = new List<Comment>();
+        public ICollection<SavedPost> SavedByUsers { get; set; } = new List<SavedPost>();
     }
 }

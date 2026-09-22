@@ -71,6 +71,8 @@ namespace Reddit_MVP_backend.Controllers
         [HttpGet("{name}/posts")]
         public async Task<IActionResult> GetCommunityPosts(string name)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
             var normalizedName = name.Trim().ToLower();
 
             var communityExists = await _context.Communities
@@ -85,6 +87,7 @@ namespace Reddit_MVP_backend.Controllers
                 .Include(post => post.Author)
                 .Include(post => post.Community)
                 .Include(post => post.Comments)
+                .Include(post => post.SavedByUsers)
                 .Where(post => post.Community.Name == normalizedName)
                 .OrderByDescending(post => post.CreatedAt)
                 .Select(post => new
@@ -99,7 +102,8 @@ namespace Reddit_MVP_backend.Controllers
                     communityId = post.CommunityId,
                     communityName = post.Community.Name,
                     voteScore = 0,
-                    commentsCount = post.Comments.Count
+                    commentsCount = post.Comments.Count,
+                    isSaved = !string.IsNullOrWhiteSpace(userId) && post.SavedByUsers.Any(savedPost => savedPost.UserId == userId)
                 })
                 .ToListAsync();
 
