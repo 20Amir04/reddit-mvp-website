@@ -261,5 +261,62 @@ namespace Reddit_MVP_backend.Controllers
 
             return Ok(new { message = "Left Community successfully", isMember = false });
         }
+
+        [Authorize]
+        [HttpPut("{id:int}")]
+        public async Task<IActionResult> UpdateCommunity(int id, [FromBody] UpdateCommunityDto updateCommunityDto)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return Unauthorized(new { message = "Invalid token" });
+            }
+
+            var community = await _context.Communities
+                .FirstOrDefaultAsync(community => community.Id == id);
+
+            if (community == null)
+            {
+                return NotFound(new { message = "Community not found" });
+            }
+
+            if (community.CreatorId != userId)
+            {
+                return Forbid();
+            }
+
+            if (string.IsNullOrWhiteSpace(updateCommunityDto.Description))
+            {
+                return BadRequest(new { message = "Community description is required" });
+            }
+
+            var trimmedDescription = updateCommunityDto.Description.Trim();
+
+            if (trimmedDescription.Length > 500)
+            {
+                return BadRequest(new { message = "Community description cannot exceed 500 characters." });
+            }
+
+            community.Description = trimmedDescription;
+            community.BannerImageUrl = string.IsNullOrWhiteSpace(updateCommunityDto.BannerImageUrl)
+                ? null
+                : updateCommunityDto.BannerImageUrl.Trim();
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = "Community updated successfully!",
+                community = new
+                {
+                    community.Id,
+                    community.Name,
+                    community.Description,
+                    community.BannerImageUrl,
+                    community.CreatedAt
+                }
+            });
+        }
     }
 }
