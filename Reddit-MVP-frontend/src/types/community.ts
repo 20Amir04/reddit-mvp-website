@@ -19,3 +19,13 @@ export type CreateCommunityResponse = {
     message: string;
     community: Community;
 };
+
+export type UpdateCommunityRequest = {
+    description: string;
+    bannerImageUrl?: string | null;
+};
+
+export type UpdateCommunityResponse = {
+    message: string;
+    community: Community;
+};

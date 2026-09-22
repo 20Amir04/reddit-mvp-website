@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import { getCommunityByName, joinCommunity, leaveCommunity } from "../api/communityApi";
+import { getCommunityByName, joinCommunity, leaveCommunity, updateCommunity } from "../api/communityApi";
 import type { Community } from "../types/community";
 import { useAuth } from "../context/AuthContext";
 import { getCommunityPosts } from "../api/postApi";
@@ -15,6 +15,11 @@ function CommunityDetailsPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [posts, setPosts] = useState<Post[]>([]);
     const [arePostsLoading, setArePostsLoading] = useState(true);
+    const [isEditingCommunity, setIsEditingCommunity] = useState(false);
+    const [editDescription, setEditDescription] = useState("");
+    const [editBanner, setEditBanner] = useState("");
+    const [isUpdatingCommunity, setIsUpdatingCommunity] = useState(false);
+
     const [actionMessage, setActionMessage] = useState("");
     const [error, setError] = useState("");
 
@@ -34,6 +39,8 @@ function CommunityDetailsPage() {
 
                 const data = await getCommunityByName(communityName);
                 setCommunity(data);
+                setEditDescription(data.description);
+                setEditBanner(data.bannerImageUrl ?? "");
 
                 const communityPosts = await getCommunityPosts(communityName);
                 setPosts(communityPosts);
@@ -105,6 +112,54 @@ function CommunityDetailsPage() {
             const message = error.response?.data?.message ?? "Failed to leave community.";
 
             setError(message);
+        }
+    }
+
+    async function handleUpdateCommunity(event: React.FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+
+        if (!community) {
+            return;
+        }
+
+        setError("");
+        setActionMessage("");
+
+        const trimmedDescription = editDescription.trim();
+
+        if (!trimmedDescription) {
+            setError("Community description is required.");
+            return;
+        }
+
+        if (trimmedDescription.length > 500) {
+            setError("Community description cannot exceed 500 characters.");
+            return;
+        }
+
+        try {
+            setIsUpdatingCommunity(true);
+
+            const response = await updateCommunity(community.id, {
+                description: trimmedDescription,
+                bannerImageUrl: editBanner.trim() || null,
+            });
+
+            setCommunity({
+                ...community,
+                description: response.community.description,
+                bannerImageUrl: response.community.bannerImageUrl,
+            });
+
+            setActionMessage(response.message);
+            setIsEditingCommunity(false);
+        } catch (error:any) {
+            const message =
+                error.response?.data?.message ?? "Failed to update community";
+            
+            setError(message);
+        } finally {
+            setIsUpdatingCommunity(false);
         }
     }
 
@@ -190,9 +245,74 @@ function CommunityDetailsPage() {
                     </div>
 
                     {isCreator && (
-                        <div className="mt-5 rounded-xl border border-orange-500/30 bg-orange-500/10 px-4 py-3 text-sm text-orange-300">
-                            You are the creator of this community.
+                        <div className="mt-5 rounded-xl border border-orange-500/30 space-x-3 bg-orange-500/10 px-4 py-3 text-sm text-orange-300">
+                            <span>You are the creator of this community.</span>
+
+                            <button
+                                type="button"
+                                onClick={() => setIsEditingCommunity((prev) => !prev)}
+                                className="rounded-full bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-600"
+                            >
+                                {isEditingCommunity ? "Cancel Edit" : "Edit Community"}
+                            </button>
                         </div>
+                    )}
+
+                    {isCreator && isEditingCommunity && (
+                        <form
+                            onSubmit={handleUpdateCommunity}
+                            className="mt-5 space-y-5 rounded-2xl border border-white/10 bg-black/20 p-5"
+                        >
+                            <div>
+                                <label className="text-sm font-medium text-neutral-300">
+                                    Description
+                                </label>
+
+                                <textarea 
+                                    value={editDescription}
+                                    onChange={(event) => setEditDescription(event.target.value)}
+                                    rows={4}
+                                    className="mt-2 w-full resize-none rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-white outline-none placeholder:text-neutral-500 focus:border-orange-500"
+                                    placeholder="Describe this community"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="text-sm font-medium text-neutral-300">
+                                    Banner image URL
+                                </label>
+
+                                <input 
+                                    type="text"
+                                    value={editBanner}
+                                    onChange={(event) => setEditBanner(event.target.value)}
+                                    className="mt-2 w-full rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-white outline-none placeholder:text-neutral-500 focus:border-orange-500"
+                                    placeholder="Optional banner image URL"
+                                />
+                            </div>
+
+                            <div className="flex flex-wrap gap-2">
+                                <button
+                                    type="submit"
+                                    disabled={isUpdatingCommunity}
+                                    className="rounded-full bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
+                                >
+                                    {isUpdatingCommunity ? "Saving..." : "Save Changes"}
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setIsEditingCommunity(false);
+                                        setEditDescription(community.description);
+                                        setEditBanner(community.bannerImageUrl ?? "");
+                                    }}
+                                    className="rounded-full border border-white/10 px-5 py-2.5 text-sm font-semibold text-neutral-200 hover:bg-white/10"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
                     )}
 
                     {error && (
