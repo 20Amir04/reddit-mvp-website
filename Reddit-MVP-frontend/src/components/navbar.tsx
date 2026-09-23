@@ -10,10 +10,8 @@ import { useAuth } from "../context/AuthContext";
 
 const mobileMenuItems = [
     {label: "Home", path: "/"}, 
-    {label: "Popular", path: "/"}, 
-    {label: "Explore", path: "/communities"}, 
     {label: "Communities", path: "/communities"}, 
-    {label: "Saved", path: "/"},
+    {label: "Saved", path: "/saved"},
 ];                                                         
 
 function Navbar() {
@@ -89,15 +87,7 @@ function Navbar() {
                     </div>
                 </form>
 
-                <div className="flex flex-1 justify-end md:hidden">
-                    <button 
-                        type="button"
-                        className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-neutral-200 hover:bg-white/10"
-                        aria-label="Search"    
-                    >
-                        <MagnifyingGlassIcon className="h-5 w-5" />
-                    </button>
-                </div>
+                <div className="flex flex-1 justify-end md:hidden"/>
 
                 <div className="flex shrink-0 items-center gap-1 sm:gap-2">
                     {isAuthenticated && user ?(
@@ -167,7 +157,7 @@ function Navbar() {
                                     className="block rounded-full border border-white/10 px-4 py-2.5 text-center text-sm font-semibold text-neutral-200 hover:bg-white/10"
                                 >
                                     u/{user.username}
-                                </Link>
+                                </Link>          
 
                                 <button
                                     type="button"

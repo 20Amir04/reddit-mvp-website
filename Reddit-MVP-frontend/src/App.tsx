@@ -13,6 +13,7 @@ import SearchResultsPage from "./pages/SearchResultsPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import SavedPostsPage from "./pages/SavedPostsPage";
+import SettingsPage from "./pages/SettingsPage";
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
       <Route path="/u/:username" element={<UserProfilePage/>} />
       <Route path="/search" element={<SearchResultsPage/>} />
       <Route path="/saved" element={<SavedPostsPage/>} />
+      <Route path="/settings" element={<SettingsPage />}/>
 
       <Route path="*" element={<NotFoundPage/>} />
     </Routes>

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState} from "react";
 import { Link } from "react-router-dom";
-import { getCommunities, joinCommunity } from "../api/communityApi";
+import { getCommunities, joinCommunity, leaveCommunity } from "../api/communityApi";
 import type { Community } from "../types/community";
 import { useAuth } from "../context/AuthContext";
 
@@ -66,7 +66,35 @@ function CommunitiesPage() {
                 community.id === communityId
             ? {
                 ...community,
+                isMember: true,
                 membersCount: community.membersCount + 1,
+                }
+                : community
+                )
+            );
+        } catch (error: any) {
+            const message = error.response?.data?.message ?? "Failed to join community.";
+
+            setError(message);
+        }
+    }
+
+    async function handleLeaveCommunity(communityId: number) {
+        setActionMessage("");
+        setError("");
+
+        try {
+            const response = await leaveCommunity(communityId);
+
+            setActionMessage(response.message);
+
+            setCommunities((currentCommunities) => 
+                currentCommunities.map((community) => 
+                community.id === communityId
+            ? {
+                ...community,
+                isMember: false,
+                membersCount: community.membersCount - 1,
                 }
                 : community
                 )
@@ -160,14 +188,25 @@ function CommunitiesPage() {
                                     <span>Created by u/{community.creatorUsername}</span>
                                 </div>
                             </div>
-
-                            <button
-                                type="button"
-                                onClick={() => handleJoinCommunity(community.id)}
-                                className="shrink-0 rounded-full bg-white px-5 py-2 text-sm font-semibold text-neutral-950 hover:bg-neutral-200"
-                            >
-                                Join
-                            </button>
+                            
+                            {community.isMember ? (
+                                <button
+                                    type="button"
+                                    onClick={() => handleLeaveCommunity(community.id)}
+                                    className="shrink-0 rounded-full bg-white px-5 py-2 text-sm font-semibold text-neutral-950 hover:bg-neutral-200"
+                                >
+                                    Leave
+                                </button>
+                            ) : (
+                                <button
+                                    type="button"
+                                    onClick={() => handleJoinCommunity(community.id)}
+                                    className="shrink-0 rounded-full bg-white px-5 py-2 text-sm font-semibold text-neutral-950 hover:bg-neutral-200"
+                                >
+                                    Join
+                                </button>
+                            )}
+                            
                         </div>
                     </article>
                 ))}

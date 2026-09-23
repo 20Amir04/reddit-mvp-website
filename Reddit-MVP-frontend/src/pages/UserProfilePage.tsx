@@ -5,6 +5,7 @@ import PostCard from "../components/PostCard";
 import type { Post } from "../types/post";
 import type { UserProfile } from "../types/user";
 import { useAuth } from "../context/AuthContext";
+import { Link } from "react-router-dom";
 
 function UserProfilePage() {
     const {username} = useParams();
@@ -103,12 +104,20 @@ function UserProfilePage() {
                                 </p>
                             )}
                         </div>
+                            <div className="flex flex-row space-x-5">
+                                {isOwnProfile && (
+                                    <div className="rounded-xl border border-orange-500/30 bg-orange-500/10 px-4 py-3 text-sm text-orange-300">
+                                        This is your profile.
+                                    </div>  
+                                )}
 
-                            {isOwnProfile && (
-                                <div className="rounded-xl border border-orange-500/30 bg-orange-500/10 px-4 py-3 text-sm text-orange-300">
-                                    This is your profile.
-                                </div>
-                            )}
+                                <Link
+                                    to="/settings"
+                                    className="rounded-full border border-orange-500/30 bg-orange-500 px-3 py-3 text-sm font-medium text-white hover:bg-orange-500/60"
+                                >
+                                    Settings
+                                </Link>
+                            </div>
                     </div>
 
                     <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
