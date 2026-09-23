@@ -22,6 +22,8 @@ namespace Reddit_MVP_backend.Controllers
         [HttpGet]
         public async Task<IActionResult> GetCommunities()
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
             var communities = await _context.Communities
                 .Include(community => community.Creator)
                 .Include(community => community.Members)
@@ -34,7 +36,9 @@ namespace Reddit_MVP_backend.Controllers
                     community.BannerImageUrl,
                     community.CreatedAt,
                     creatorUsername = community.Creator.UserName,
-                    membersCount = community.Members.Count
+                    membersCount = community.Members.Count,
+                    isMember = !string.IsNullOrWhiteSpace(userId) &&
+                        community.Members.Any(member => member.UserId == userId)
                 })
                 .ToListAsync();
 
