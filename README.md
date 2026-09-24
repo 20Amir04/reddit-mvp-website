@@ -226,12 +226,12 @@ dotnet run
 cd Reddit-MVP-frontend
 npm install
 npm run dev
+```
 
 ## 🔌 API Endpoints
 Base URL example:
 ```bash
 https://localhost:7117/api
-```
 
 ### Authentication
 
