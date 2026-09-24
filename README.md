@@ -236,13 +236,13 @@ https://localhost:7117/api
 ```
 
 ### Authentication
-```bash
+
 - `POST /api/auth/register`
 - `POST /api/auth/login`
 - `GET /api/auth/me`
 
 ### Communities
-```bash
+
 - `GET /api/communities`
 - `GET /api/communities/{name}`
 - `POST /api/communities`
@@ -252,7 +252,7 @@ https://localhost:7117/api
 - `GET /api/communities/{name}/posts`
 
 ### Posts
-```bash
+
 - `GET /api/posts`
 - `GET /api/posts/{id}`
 - `POST /api/posts`
@@ -263,26 +263,26 @@ https://localhost:7117/api
 - `DELETE /api/posts/{id}/save`
 
 ### Comments
-```bash
+
 - `GET /api/posts/{postId}/comments`
 - `POST /api/posts/{postId}/comments`
 - `PUT /api/comments/{id}`
 - `DELETE /api/comments/{id}`
 
 ### Users
-```bash
+
 - `GET /api/users/{username}`
 - `GET /api/users/{username}/posts`
 - `GET /api/users/me/saved-posts`
 
 ### Search
-```bash
+
 - `GET /api/search?query={query}&type=all`
 - `GET /api/search?query={query}&type=posts`
 - `GET /api/search?query={query}&type=communities`
 
 ### Account Settings
-```bash
+
 - `PUT /api/account/email`
 - `PUT /api/account/password`
 ```
