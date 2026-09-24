@@ -215,22 +215,28 @@ ASP.NET Core Identity also creates additional authentication-related tables such
 ```bash
 git clone https://github.com/20Amir04/reddit-mvp-website.git
 cd reddit-mvp-website
+```
 
 ### Run Backend
+```bash
 cd Reddit-MVP-backend
 dotnet restore
 dotnet ef database update
 dotnet run
+```
 
 ### Run Frontend
+```bash
 cd Reddit-MVP-frontend
 npm install
 npm run dev
 ```
 
 ## 🔌 API Endpoints
+```bash
 Base URL example:
 https://localhost:7117/api
+```
 
 ### Authentication
 
