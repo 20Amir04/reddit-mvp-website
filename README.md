@@ -1,10 +1,10 @@
-# Reddit MVP — Full-Stack Social Forum Website
+# Reddit MVP — Full-Stack Website
 
 ## 📌 About the Project
 
 Reddit MVP is a full-stack responsive social forum web application inspired by Reddit.
 
-The project was built as a portfolio full-stack application to practice building a real-world community platform using React, TypeScript, TailwindCSS, ASP.NET Core Web API, Entity Framework Core, SQL Server, and JWT authentication.
+The project was built as a full-stack application to practice building a real-world community platform using React, TypeScript, TailwindCSS, C#, ASP.NET Core Web API, Entity Framework Core, SQL Server, and JWT authentication.
 
 The application includes a complete social platform flow: user registration, login, community creation, joining communities, creating posts, voting, commenting, saving posts, searching content, editing account settings, and managing community information.
 
@@ -20,8 +20,7 @@ The application includes a complete social platform flow: user registration, log
 - Protected routes and protected API endpoints
 - User profile page
 - User posts page
-- Change account email
-- Change account password
+- Account settings
 - Authentication-based UI updates
 
 ### 🧵 Communities
@@ -29,11 +28,9 @@ The application includes a complete social platform flow: user registration, log
 - Create communities
 - Explore communities page
 - Community detail page
-- Join communities
-- Leave communities
+- Join/Leave communities
 - Conditional Join / Leave button state
-- Edit community description
-- Edit community banner image URL
+- Community settings
 - Community creator ownership checks
 
 ### 📝 Posts
@@ -140,7 +137,7 @@ The application includes a complete social platform flow: user registration, log
 
 This project was created to practice:
 
-- Building a full-stack social media style application
+- Building a full-stack social media style website
 - Structuring a React + TypeScript frontend project
 - Creating reusable UI components
 - Building protected frontend routes
@@ -215,7 +212,77 @@ ASP.NET Core Identity also creates additional authentication-related tables such
 ## ⚙️ Installation
 
 ### Clone repository
-
 ```bash
 git clone https://github.com/20Amir04/reddit-mvp-website.git
 cd reddit-mvp-website
+
+### Run Backend
+```bash
+cd Reddit-MVP-backend
+dotnet restore
+dotnet ef database update
+dotnet run
+
+### Run Frontend
+```bash
+cd Reddit-MVP-frontend
+npm install
+npm run dev
+
+## 🔌 API Endpoints
+Base URL example:
+```bash
+https://localhost:7117/api
+```
+
+### Authentication
+```bash
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `GET /api/auth/me`
+
+### Communities
+```bash
+- `GET /api/communities`
+- `GET /api/communities/{name}`
+- `POST /api/communities`
+- `PUT /api/communities/{id}`
+- `POST /api/communities/{id}/join`
+- `DELETE /api/communities/{id}/leave`
+- `GET /api/communities/{name}/posts`
+
+### Posts
+```bash
+- `GET /api/posts`
+- `GET /api/posts/{id}`
+- `POST /api/posts`
+- `PUT /api/posts/{id}`
+- `DELETE /api/posts/{id}`
+- `POST /api/posts/{id}/vote`
+- `POST /api/posts/{id}/save`
+- `DELETE /api/posts/{id}/save`
+
+### Comments
+```bash
+- `GET /api/posts/{postId}/comments`
+- `POST /api/posts/{postId}/comments`
+- `PUT /api/comments/{id}`
+- `DELETE /api/comments/{id}`
+
+### Users
+```bash
+- `GET /api/users/{username}`
+- `GET /api/users/{username}/posts`
+- `GET /api/users/me/saved-posts`
+
+### Search
+```bash
+- `GET /api/search?query={query}&type=all`
+- `GET /api/search?query={query}&type=posts`
+- `GET /api/search?query={query}&type=communities`
+
+### Account Settings
+```bash
+- `PUT /api/account/email`
+- `PUT /api/account/password`
+```
