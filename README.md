@@ -209,6 +209,37 @@ ASP.NET Core Identity also creates additional authentication-related tables such
 
 ---
 
+## 📸 Screenshots
+
+### Desktop
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/e7752a71-4f22-4957-a923-8003cc1d5663" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/27fb4ac8-c5a5-4410-8a62-d0823ca4d104" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/f189f910-738f-4304-b6e3-fa28d17c394b" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/82c7040f-9aae-4da5-a24e-d16a7f95c92b" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/49a54427-2fcc-492b-b51e-45ca28601c69" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/ff70be5c-90eb-4916-adb3-f47d4653d818" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/ddb76477-77cb-4189-bda2-a782b8a34983" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/7841f101-be64-404a-aa49-7268c04ab8be" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/2d31c505-6c01-4536-bf0b-b5dd3a0271c2" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/0615bef1-b4ff-4bee-9f9f-3fa607b5ff2c" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/e44adafe-f91b-4253-87ce-a9159dbce899" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/56b066c9-7751-47af-8dc7-f39f2b6daf81" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/e9c8794c-27c3-47b1-8bb3-9945ec9ed85f" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/018caf99-7cf1-42b3-8190-85bf431723e7" />
+
+
+### Mobile version
+<img width="328" height="717" alt="Screenshot (185)" src="https://github.com/user-attachments/assets/86b2fce6-2b68-4f96-aa9a-61bd5fe8fd97" />
+<img width="328" height="716" alt="Screenshot (187)" src="https://github.com/user-attachments/assets/0d368358-4159-4706-bfe2-e398f1e42fc2" />
+<img width="326" height="716" alt="Screenshot (186)" src="https://github.com/user-attachments/assets/0be0857a-9005-43b6-8aba-911a43c1c07b" />
+<img width="331" height="714" alt="Screenshot (188)" src="https://github.com/user-attachments/assets/6448dd29-cf0e-4c25-99af-aaa4b12fce33" />
+<img width="331" height="714" alt="Screenshot (189)" src="https://github.com/user-attachments/assets/afae1cdc-74d5-4605-9c2e-b6ef63b62a84" />
+<img width="330" height="715" alt="Screenshot (190)" src="https://github.com/user-attachments/assets/9a233298-3741-40e5-8ab5-13e20e980a06" />
+<img width="326" height="715" alt="Screenshot (191)" src="https://github.com/user-attachments/assets/88b3f5dd-675d-4adf-b097-9e0dc7feea52" />
+<img width="324" height="718" alt="Screenshot (192)" src="https://github.com/user-attachments/assets/9dc96275-1b51-4211-a3f3-e1a2a4bb7e0c" />
+
+---
+
 ## ⚙️ Installation
 
 ### Clone repository
@@ -288,4 +319,13 @@ https://localhost:7117/api
 
 - `PUT /api/account/email`
 - `PUT /api/account/password`
-```
+
+---
+
+## 👨‍💻 Author
+
+Amir Arabi
+Software Engineering Student
+Junior / Intern Full-Stack Developer
+
+GitHub: https://github.com/20Amir04
