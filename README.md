@@ -324,8 +324,8 @@ https://localhost:7117/api
 
 ## 👨‍💻 Author
 
-**Amir Arabi**
-Software Engineering Student
+**Amir Arabi**  
+Software Engineering Student  
 Junior / Intern Full-Stack Developer
 
 GitHub: https://github.com/20Amir04
